@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="favicon.ico" />
-    <title>步梦宇</title>
+    <title>步梦梦</title>
     <style>
       * {
         margin: 0;
@@ -16,10 +16,10 @@
         display: flex;
         min-height: 100vh;
         perspective: 800px;
-        /*background: #000;*/
+        background: #000;
         /*background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);*/
 
-        background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%);
+        /* background-image: linear-gradient(to top, #a18cd1 0%, #fbc2eb 100%); */
         touch-action: none;
         overflow: hidden;
       }
@@ -91,6 +91,9 @@
         });
     </script>
     <script>
+      let diff = null;
+      let rafId = null;
+      const rotate = { x: -10, y: 0 };
       function render() {
         // 获取dom
         const container = document.querySelector(".container");
@@ -118,8 +121,6 @@
         let isPointerDown = false;
         let point = null;
         let last = null;
-        let diff = null;
-        let rafId = null;
         container.addEventListener("pointerdown", function (e) {
           this.setPointerCapture(e.pointerId);
           isPointerDown = true;
@@ -135,17 +136,20 @@
             rotate.x -= diff.y * 0.1;
             rotate.y += diff.x * 0.1;
             last = { x: current.x, y: current.y };
+
+            console.log(rotate);
+            for (let i = 0; i < length; i++) {
+              imgList[i].style.transition = "unset";
+              imgList[i].style.transform =
+                "rotateY(" + (angle * i + rotate.y) + "deg) translateZ(1600px)";
+            }
             wrap.style.transform =
-              "rotateX(" +
-              rotate.x +
-              "deg) rotateY(" +
-              rotate.y +
-              "deg) translateZ(-1200px)";
+              "rotateX(" + rotate.x + "deg) translateZ(-1200px)";
           }
         });
         container.addEventListener("pointerup", function (e) {
           isPointerDown = false;
-          raf();
+          // raf();
         });
         // 指针取消
         container.addEventListener("pointercancel", function (e) {
@@ -160,17 +164,25 @@
       function raf() {
         let { x, y } = diff;
 
+        const imgList = document.querySelectorAll(".wrap img");
+        const length = imgList.length;
+        const angle = 360 / length;
+
         function step() {
           x *= 0.95;
           y *= 0.95;
           rotate.x -= y * 0.1;
           rotate.y += x * 0.1;
-          wrap.style.transform =
-            "rotateX(" +
-            rotate.x +
-            "deg) rotateY(" +
-            rotate.y +
-            "deg)  translateZ(-1200px)";
+          // wrap.style.transform =
+          //   "rotateX(" +
+          //   rotate.x +
+          //   "deg) rotateY(" +
+          //   rotate.y +
+          //   "deg)  translateZ(-1200px)";
+          for (let i = 0; i < length; i++) {
+            imgList[i].style.transform =
+              "rotateY(" + (angle * i + rotate.x) + "deg) translateZ(-1200px)";
+          }
           if (Math.abs(x) > 1 || Math.abs(y) > 1) {
             rafId = requestAnimationFrame(step);
           }
